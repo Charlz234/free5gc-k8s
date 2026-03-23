@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ausf
+  namespace: free5gc
+  labels:
+    app: ausf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ausf
+  template:
+    metadata:
+      labels:
+        app: ausf
+    spec:
+      containers:
+        - name: ausf
+          image: free5gc/ausf:v4.2.0
+          command: ["./ausf", "-c", "./config/ausfcfg.yaml"]
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/ausfcfg.yaml
+              subPath: ausfcfg.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: ausf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ausf-nausf
+  namespace: free5gc
+spec:
+  selector:
+    app: ausf
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP

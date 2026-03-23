@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amf
+  namespace: free5gc
+  labels:
+    app: amf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amf
+  template:
+    metadata:
+      labels:
+        app: amf
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: amf
+          image: free5gc/amf:v4.2.0
+          command: ["./amf", "-c", "./config/amfcfg.yaml"]
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"]
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/amfcfg.yaml
+              subPath: amfcfg.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: amf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amf-namf
+  namespace: free5gc
+spec:
+  selector:
+    app: amf
+  ports:
+    - name: sbi
+      port: 8018
+      targetPort: 8018
+  type: ClusterIP

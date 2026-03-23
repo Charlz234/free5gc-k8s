@@ -1,0 +1,25 @@
+global:
+  name: free5gc
+  namespace: free5gc
+
+mongodb:
+  enabled: true
+  auth:
+    enabled: false
+  service:
+    port: 27017
+
+amf:
+  n2:
+    hostIP: 10.0.2.3
+    port: 38412
+
+upf:
+  pfcp:
+    hostIP: 10.0.2.3
+  gtp:
+    hostIP: 10.0.2.3
+
+smf:
+  pfcp:
+    hostIP: 10.0.2.3

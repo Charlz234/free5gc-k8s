@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udm
+  namespace: free5gc
+  labels:
+    app: udm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: udm
+  template:
+    metadata:
+      labels:
+        app: udm
+    spec:
+      containers:
+        - name: udm
+          image: free5gc/udm:v4.2.0
+          command: ["./udm", "-c", "./config/udmcfg.yaml"]
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/udmcfg.yaml
+              subPath: udmcfg.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: udm-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udm-nudm
+  namespace: free5gc
+spec:
+  selector:
+    app: udm
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP

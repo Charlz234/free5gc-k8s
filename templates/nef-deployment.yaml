@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nef
+  namespace: free5gc
+  labels:
+    app: nef
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nef
+  template:
+    metadata:
+      labels:
+        app: nef
+    spec:
+      containers:
+        - name: nef
+          image: free5gc/nef:v4.2.0
+          command: ["./nef", "-c", "./config/nefcfg.yaml"]
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/nefcfg.yaml
+              subPath: nefcfg.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: nef-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nef-nnef
+  namespace: free5gc
+spec:
+  selector:
+    app: nef
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP

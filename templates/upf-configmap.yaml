@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: upf-config
+  namespace: free5gc
+data:
+  upfcfg.yaml: |
+    version: 1.0.3
+    description: UPF initial local configuration
+    pfcp:
+      addr: 0.0.0.0
+      nodeID: 10.0.2.3
+      retransTimeout: 1s
+      maxRetrans: 3
+    gtpu:
+      forwarder: gtp5g
+      ifList:
+        - addr: 10.0.2.3
+          type: N3
+    dnnList:
+      - dnn: internet
+        cidr: 10.60.0.0/16
+      - dnn: internet
+        cidr: 10.61.0.0/16
+    logger:
+      enable: true
+      level: info
+      reportCaller: false
+  upf-iptables.sh: |
+    #!/bin/bash
+    iptables -t nat -A POSTROUTING -s 10.60.0.0/16 -o ens4 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s 10.61.0.0/16 -o ens4 -j MASQUERADE
+    iptables -I FORWARD 1 -j ACCEPT

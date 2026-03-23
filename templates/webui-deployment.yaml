@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webui
+  namespace: free5gc
+  labels:
+    app: webui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webui
+  template:
+    metadata:
+      labels:
+        app: webui
+    spec:
+      containers:
+        - name: webui
+          image: free5gc/webui:v4.2.0
+          command: ["./webui", "-c", "./config/webuicfg.yaml"]
+          env:
+            - name: GIN_MODE
+              value: release
+          ports:
+            - containerPort: 5000
+            - containerPort: 2121
+            - containerPort: 2122
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/webuicfg.yaml
+              subPath: webuicfg.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: webui-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webui
+  namespace: free5gc
+spec:
+  selector:
+    app: webui
+  ports:
+    - name: webui
+      port: 5000
+      targetPort: 5000
+      nodePort: 30500
+    - name: billing-passive
+      port: 2121
+      targetPort: 2121
+      nodePort: 30521
+    - name: billing-active
+      port: 2122
+      targetPort: 2122
+      nodePort: 30522
+  type: NodePort

@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smf
+  namespace: free5gc
+  labels:
+    app: smf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smf
+  template:
+    metadata:
+      labels:
+        app: smf
+      annotations:
+    spec:
+      containers:
+        - name: smf
+          image: free5gc/smf:v4.2.0
+          command: ["./smf", "-c", "./config/smfcfg.yaml"]
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/smfcfg.yaml
+              subPath: smfcfg.yaml
+            - name: config
+              mountPath: /free5gc/config/uerouting.yaml
+              subPath: uerouting.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: smf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smf-nsmf
+  namespace: free5gc
+spec:
+  selector:
+    app: smf
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP

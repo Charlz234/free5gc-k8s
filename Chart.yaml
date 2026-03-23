@@ -1,0 +1,14 @@
+apiVersion: v2
+name: free5gc-k8s
+description: Helm chart for deploying Free5GC 5G core on Kubernetes - no Multus required
+version: 0.1.0
+appVersion: "v4.2.0"
+maintainers:
+  - name: Idemudia Charles Okojie
+    email: ideco001@hotmail.com
+    url: https://github.com/Charlz234
+dependencies:
+  - name: mongodb
+    version: "16.4.0"
+    repository: https://charts.bitnami.com/bitnami
+    condition: mongodb.enabled

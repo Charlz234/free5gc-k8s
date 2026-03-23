@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nrf
+  namespace: free5gc
+  labels:
+    app: nrf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nrf
+  template:
+    metadata:
+      labels:
+        app: nrf
+    spec:
+      containers:
+        - name: nrf
+          image: free5gc/nrf:v4.2.0
+          command: ["./nrf", "-c", "./config/nrfcfg.yaml"]
+          volumeMounts:
+            - name: config
+              mountPath: /free5gc/config/nrfcfg.yaml
+              subPath: nrfcfg.yaml
+      volumes:
+        - name: config
+          configMap:
+            name: nrf-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nrf-nnrf
+  namespace: free5gc
+spec:
+  selector:
+    app: nrf
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
