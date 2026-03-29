@@ -13,22 +13,50 @@ kubectl get rs -n free5gc -o name | while read rs; do
     kubectl delete $rs -n free5gc
   fi
 done
-sleep 5
 
-echo "=== Step 3: Wait for Multus to be healthy ==="
-until kubectl get pods -n kube-system | grep multus | grep -q "1/1.*Running"; do
-  echo "Waiting for Multus..."
-  sleep 5
-done
-echo "Multus is healthy"
-
-echo "=== Step 4: Scale down all NFs ==="
+echo "=== Step 3: Scale down all NFs ==="
 kubectl get deployments -n free5gc -o name | \
-  xargs -r kubectl scale -n free5gc --replicas=0 2>/dev/null || true
+  xargs kubectl scale -n free5gc --replicas=0 2>/dev/null || true
 sleep 10
 
-echo "=== Step 5: Delete upfgtp interface if it exists ==="
-sudo ip link delete upfgtp 2>/dev/null && echo "Deleted upfgtp" || echo "upfgtp not present"
+echo "=== Step 4: Ensure CNI configs exist ==="
+if [ ! -f /etc/cni/net.d/05-cilium.conflist ]; then
+  echo "Writing missing 05-cilium.conflist..."
+  sudo tee /etc/cni/net.d/05-cilium.conflist << 'CNIEOF'
+{
+  "cniVersion": "0.3.1",
+  "name": "cilium",
+  "plugins": [
+    {
+       "type": "cilium-cni",
+       "enable-debug": false,
+       "log-file": "/var/run/cilium/cilium-cni.log"
+    }
+  ]
+}
+CNIEOF
+fi
+
+if [ ! -f /etc/cni/net.d/00-multus.conf ]; then
+  echo "Writing missing 00-multus.conf..."
+  sudo tee /etc/cni/net.d/00-multus.conf << 'CNIEOF'
+{
+  "cniVersion": "0.3.1",
+  "name": "multus-cni-network",
+  "type": "multus-shim",
+  "logLevel": "verbose",
+  "logToStderr": true,
+  "clusterNetwork": "/host/etc/cni/net.d/05-cilium.conflist"
+}
+CNIEOF
+fi
+
+echo "=== Step 5: Wait for Multus to be healthy ==="
+until kubectl get pods -n kube-system | grep multus | grep -q "1/1.*Running"; do
+  echo "=== Waiting 30s for Multus to stabilize ==="
+  sleep 30
+done
+echo "Multus is healthy"
 
 echo "=== Step 6: Start NFs one by one ==="
 for nf in mongodb nrf udr udm ausf pcf nssf nef amf upf smf webui; do
