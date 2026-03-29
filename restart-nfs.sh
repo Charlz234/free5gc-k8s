@@ -24,7 +24,7 @@ echo "Multus is healthy"
 
 echo "=== Step 4: Scale down all NFs ==="
 kubectl get deployments -n free5gc -o name | \
-  xargs kubectl scale -n free5gc --replicas=0
+  xargs -r kubectl scale -n free5gc --replicas=0 2>/dev/null || true
 sleep 10
 
 echo "=== Step 5: Delete upfgtp interface if it exists ==="
