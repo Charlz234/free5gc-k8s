@@ -2,7 +2,7 @@
 # Free5GC NF restart in correct order with deep cleanup
 
 echo "=== Step 0: Host-Level Runtime & CNI Cleanup ==="
-# Clean up stale CNI network namespaces and Multus sockets that cause EOF errors
+# Clean up stale CNI network namespaces and Multus sockets
 sudo ip -all netns delete 2>/dev/null
 sudo rm -rf /var/run/multus/* 2>/dev/null
 sudo rm -rf /var/lib/cni/networks/multus-cni-network/* 2>/dev/null
@@ -66,7 +66,7 @@ kubectl rollout status ds/kube-multus-ds -n kube-system --timeout=120s
 echo "Multus is healthy"
 
 echo "=== Step 7: Start NFs one by one with Readiness Checks ==="
-# Improved: Waits for each NF to actually be READY before starting the next
+# Waits for each NF to actually be READY before starting the next
 for nf in mongodb nrf udr udm ausf pcf nssf nef amf upf smf webui; do
   echo "Starting $nf..."
   kubectl scale deployment/$nf -n free5gc --replicas=1
