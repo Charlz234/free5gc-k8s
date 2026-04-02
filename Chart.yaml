@@ -1,6 +1,6 @@
 apiVersion: v2
 name: free5gc-k8s
-description: Helm chart for deploying Free5GC 5G core on Kubernetes - no Multus required
+description: Free5GC v4.2 on Kubernetes with Cilium CNI, Multus, and Hubble observability
 version: 0.1.0
 appVersion: "v4.2.0"
 maintainers:
