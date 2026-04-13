@@ -1,0 +1,211 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-amf
+  namespace: monitoring
+  labels:
+    app: amf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: amf
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-smf
+  namespace: monitoring
+  labels:
+    app: smf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: smf
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-nrf
+  namespace: monitoring
+  labels:
+    app: nrf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: nrf
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-ausf
+  namespace: monitoring
+  labels:
+    app: ausf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: ausf
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-udm
+  namespace: monitoring
+  labels:
+    app: udm
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: udm
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-udr
+  namespace: monitoring
+  labels:
+    app: udr
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: udr
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-pcf
+  namespace: monitoring
+  labels:
+    app: pcf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: pcf
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-nssf
+  namespace: monitoring
+  labels:
+    app: nssf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: nssf
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: free5gc-nef
+  namespace: monitoring
+  labels:
+    app: nef
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: nef
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+
+---
+# NOTE: UPF runs hostNetwork=true — its metrics port is on the node directly.
+# A PodMonitor is more appropriate than ServiceMonitor for hostNetwork pods.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: free5gc-upf
+  namespace: monitoring
+  labels:
+    app: upf
+    release: kube-prom-stack
+spec:
+  namespaceSelector:
+    matchNames:
+      - free5gc
+  selector:
+    matchLabels:
+      app: upf
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s

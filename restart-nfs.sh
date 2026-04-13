@@ -26,6 +26,55 @@ sudo rm -rf /var/lib/cni/networks/cbr0/* 2>/dev/null || true
 info "CNI state cleared"
 
 # ============================================================
+# STEP 0.5 — Check and rebuild gtp5g if kernel was updated
+# ============================================================
+info "=== Step 0.5: gtp5g kernel module check ==="
+
+GTP5G_SRC="${HOME}/gtp5g"
+CURRENT_KERNEL=$(uname -r)
+GTP5G_INSTALLED="/usr/lib/modules/${CURRENT_KERNEL}/kernel/drivers/net/gtp5g.ko"
+
+if lsmod | grep -q gtp5g; then
+  info "gtp5g already loaded for kernel ${CURRENT_KERNEL}"
+elif [ -f "$GTP5G_INSTALLED" ]; then
+  info "gtp5g built for ${CURRENT_KERNEL} — loading..."
+  sudo modprobe gtp5g
+  if lsmod | grep -q gtp5g; then
+    info "gtp5g loaded successfully"
+  else
+    error "gtp5g failed to load — UPF will crash"
+  fi
+else
+  warn "gtp5g not built for kernel ${CURRENT_KERNEL} — rebuilding from source..."
+  if [ ! -d "$GTP5G_SRC" ]; then
+    error "gtp5g source not found at ${GTP5G_SRC} — cannot rebuild"
+    error "Run: git clone https://github.com/free5gc/gtp5g.git ~/gtp5g"
+    exit 1
+  fi
+
+  cd "$GTP5G_SRC"
+  make clean
+  make -j$(nproc) CC=gcc-12 2>&1 | tail -5
+
+  if [ $? -ne 0 ]; then
+    error "gtp5g build failed — check gcc-12 is installed: sudo apt install gcc-12"
+    exit 1
+  fi
+
+  sudo make install
+  sudo modprobe gtp5g
+
+  if lsmod | grep -q gtp5g; then
+    info "gtp5g rebuilt and loaded for kernel ${CURRENT_KERNEL}"
+  else
+    error "gtp5g loaded failed after rebuild"
+    exit 1
+  fi
+
+  cd - > /dev/null
+fi
+
+# ============================================================
 # STEP 1 — Force delete all Unknown/stuck pods cluster-wide
 # ============================================================
 info "=== Step 1: Force delete Unknown/stuck pods cluster-wide ==="

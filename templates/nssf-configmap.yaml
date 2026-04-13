@@ -33,3 +33,7 @@ data:
       enable: true
       level: info
       reportCaller: false
+    metrics:
+      enable: true
+      bindingIP: 0.0.0.0
+      port: 9089
