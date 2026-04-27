@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: udr
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: udr
 spec:
-  replicas: 1
+  replicas: {{ .Values.udr.replicas }}
   selector:
     matchLabels:
       app: udr
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: udr
-          image: free5gc/udr:v4.2.0
+          image: {{ .Values.udr.image.repository }}:{{ .Values.udr.image.tag }}
           command: ["./udr", "-c", "./config/udrcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.udr.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.udr.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/udrcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: udr-nudr
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: udr
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.udr.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.udr.metrics.port }}
+      targetPort: {{ .Values.udr.metrics.port }}
+    {{- end }}
   type: ClusterIP

@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nrf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: nrf
 spec:
-  replicas: 1
+  replicas: {{ .Values.nrf.replicas }}
   selector:
     matchLabels:
       app: nrf
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: nrf
-          image: free5gc/nrf:v4.2.0
+          image: {{ .Values.nrf.image.repository }}:{{ .Values.nrf.image.tag }}
           command: ["./nrf", "-c", "./config/nrfcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.nrf.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.nrf.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/nrfcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nrf-nnrf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: nrf
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.nrf.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.nrf.metrics.port }}
+      targetPort: {{ .Values.nrf.metrics.port }}
+    {{- end }}
   type: ClusterIP

@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nssf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: nssf
 spec:
-  replicas: 1
+  replicas: {{ .Values.nssf.replicas }}
   selector:
     matchLabels:
       app: nssf
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: nssf
-          image: free5gc/nssf:v4.2.0
+          image: {{ .Values.nssf.image.repository }}:{{ .Values.nssf.image.tag }}
           command: ["./nssf", "-c", "./config/nssfcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.nssf.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.nssf.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/nssfcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nssf-nnssf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: nssf
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.nssf.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.nssf.metrics.port }}
+      targetPort: {{ .Values.nssf.metrics.port }}
+    {{- end }}
   type: ClusterIP

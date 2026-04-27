@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nef
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: nef
 spec:
-  replicas: 1
+  replicas: {{ .Values.nef.replicas }}
   selector:
     matchLabels:
       app: nef
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: nef
-          image: free5gc/nef:v4.2.0
+          image: {{ .Values.nef.image.repository }}:{{ .Values.nef.image.tag }}
           command: ["./nef", "-c", "./config/nefcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.nef.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.nef.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/nefcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nef-nnef
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: nef
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.nef.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.nef.metrics.port }}
+      targetPort: {{ .Values.nef.metrics.port }}
+    {{- end }}
   type: ClusterIP

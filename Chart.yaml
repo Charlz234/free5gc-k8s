@@ -7,8 +7,4 @@ maintainers:
   - name: Idemudia Charles Okojie
     email: ideco001@hotmail.com
     url: https://github.com/Charlz234
-dependencies:
-  - name: mongodb
-    version: "16.4.0"
-    repository: https://charts.bitnami.com/bitnami
-    condition: mongodb.enabled
+

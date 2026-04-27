@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: upf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: upf
 spec:
-  replicas: 1
+  replicas: {{ .Values.upf.replicas }}
   selector:
     matchLabels:
       app: upf
@@ -19,7 +19,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       initContainers:
         - name: iptables-init
-          image: free5gc/upf:v4.2.0
+          image: {{ .Values.upf.image.repository }}:{{ .Values.upf.image.tag }}
           command: ["bash", "/free5gc/config/upf-iptables.sh"]
           securityContext:
             capabilities:
@@ -30,11 +30,16 @@ spec:
               subPath: upf-iptables.sh
       containers:
         - name: upf
-          image: free5gc/upf:v4.2.0
+          image: {{ .Values.upf.image.repository }}:{{ .Values.upf.image.tag }}
           command: ["./upf", "-c", "./config/upfcfg.yaml"]
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
+          {{- if .Values.upf.metrics.enabled }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.upf.metrics.port }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/upfcfg.yaml
@@ -48,7 +53,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: upf-pfcp
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: upf

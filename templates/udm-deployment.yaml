@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: udm
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: udm
 spec:
-  replicas: 1
+  replicas: {{ .Values.udm.replicas }}
   selector:
     matchLabels:
       app: udm
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: udm
-          image: free5gc/udm:v4.2.0
+          image: {{ .Values.udm.image.repository }}:{{ .Values.udm.image.tag }}
           command: ["./udm", "-c", "./config/udmcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.udm.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.udm.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/udmcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: udm-nudm
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: udm
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.udm.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.udm.metrics.port }}
+      targetPort: {{ .Values.udm.metrics.port }}
+    {{- end }}
   type: ClusterIP

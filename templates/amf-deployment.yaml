@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: amf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: amf
 spec:
-  replicas: 1
+  replicas: {{ .Values.amf.replicas }}
   selector:
     matchLabels:
       app: amf
@@ -19,11 +19,18 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: amf
-          image: free5gc/amf:v4.2.0
+          image: {{ .Values.amf.image.repository }}:{{ .Values.amf.image.tag }}
           command: ["./amf", "-c", "./config/amfcfg.yaml"]
           securityContext:
             capabilities:
               add: ["NET_ADMIN"]
+          ports:
+            - name: sbi
+              containerPort: 8018
+            {{- if .Values.amf.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.amf.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/amfcfg.yaml
@@ -37,7 +44,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: amf-namf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: amf
@@ -45,4 +52,9 @@ spec:
     - name: sbi
       port: 8018
       targetPort: 8018
+    {{- if .Values.amf.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.amf.metrics.port }}
+      targetPort: {{ .Values.amf.metrics.port }}
+    {{- end }}
   type: ClusterIP

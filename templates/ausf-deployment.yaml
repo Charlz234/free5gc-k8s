@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ausf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: ausf
 spec:
-  replicas: 1
+  replicas: {{ .Values.ausf.replicas }}
   selector:
     matchLabels:
       app: ausf
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: ausf
-          image: free5gc/ausf:v4.2.0
+          image: {{ .Values.ausf.image.repository }}:{{ .Values.ausf.image.tag }}
           command: ["./ausf", "-c", "./config/ausfcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.ausf.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.ausf.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/ausfcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ausf-nausf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: ausf
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.ausf.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.ausf.metrics.port }}
+      targetPort: {{ .Values.ausf.metrics.port }}
+    {{- end }}
   type: ClusterIP

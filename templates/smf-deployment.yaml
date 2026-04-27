@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: smf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: smf
 spec:
-  replicas: 1
+  replicas: {{ .Values.smf.replicas }}
   selector:
     matchLabels:
       app: smf
@@ -14,12 +14,18 @@ spec:
     metadata:
       labels:
         app: smf
-      annotations:
     spec:
       containers:
         - name: smf
-          image: free5gc/smf:v4.2.0
+          image: {{ .Values.smf.image.repository }}:{{ .Values.smf.image.tag }}
           command: ["./smf", "-c", "./config/smfcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.smf.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.smf.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/smfcfg.yaml
@@ -36,11 +42,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: smf-nsmf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: smf
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.smf.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.smf.metrics.port }}
+      targetPort: {{ .Values.smf.metrics.port }}
+    {{- end }}
   type: ClusterIP

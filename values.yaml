@@ -1,25 +1,115 @@
 global:
   name: free5gc
   namespace: free5gc
+  plmn:
+    mcc: "208"
+    mnc: "93"
 
 mongodb:
-  enabled: true
-  auth:
-    enabled: false
   service:
     port: 27017
 
 amf:
+  image:
+    repository: free5gc/amf
+    tag: v4.2.0
+  replicas: 1
+  hostIP: 10.0.2.3
   n2:
-    hostIP: 10.0.2.3
     port: 38412
+  metrics:
+    enabled: false
+    port: 9089
+
+ausf:
+  image:
+    repository: free5gc/ausf
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
+
+nef:
+  image:
+    repository: free5gc/nef
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
+
+nrf:
+  image:
+    repository: free5gc/nrf
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
+
+nssf:
+  image:
+    repository: free5gc/nssf
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
+
+pcf:
+  image:
+    repository: free5gc/pcf
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
+
+smf:
+  image:
+    repository: free5gc/smf
+    tag: v4.2.0
+  replicas: 1
+  pfcp:
+    hostIP: 10.0.2.3
+  metrics:
+    enabled: false
+    port: 9089
+
+udm:
+  image:
+    repository: free5gc/udm
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
+
+udr:
+  image:
+    repository: free5gc/udr
+    tag: v4.2.0
+  replicas: 1
+  metrics:
+    enabled: false
+    port: 9089
 
 upf:
+  image:
+    repository: free5gc/upf
+    tag: v4.2.0
+  replicas: 1
   pfcp:
     hostIP: 10.0.2.3
   gtp:
     hostIP: 10.0.2.3
+  metrics:
+    enabled: false
+    port: 9089
 
-smf:
-  pfcp:
-    hostIP: 10.0.2.3
+webui:
+  image:
+    repository: free5gc/webui
+    tag: v4.2.0
+  replicas: 1

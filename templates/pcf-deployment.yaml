@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: pcf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
   labels:
     app: pcf
 spec:
-  replicas: 1
+  replicas: {{ .Values.pcf.replicas }}
   selector:
     matchLabels:
       app: pcf
@@ -17,8 +17,15 @@ spec:
     spec:
       containers:
         - name: pcf
-          image: free5gc/pcf:v4.2.0
+          image: {{ .Values.pcf.image.repository }}:{{ .Values.pcf.image.tag }}
           command: ["./pcf", "-c", "./config/pcfcfg.yaml"]
+          ports:
+            - name: sbi
+              containerPort: 8000
+            {{- if .Values.pcf.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.pcf.metrics.port }}
+            {{- end }}
           volumeMounts:
             - name: config
               mountPath: /free5gc/config/pcfcfg.yaml
@@ -32,11 +39,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pcf-npcf
-  namespace: free5gc
+  namespace: {{ .Values.global.namespace }}
 spec:
   selector:
     app: pcf
   ports:
-    - port: 8000
+    - name: sbi
+      port: 8000
       targetPort: 8000
+    {{- if .Values.pcf.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.pcf.metrics.port }}
+      targetPort: {{ .Values.pcf.metrics.port }}
+    {{- end }}
   type: ClusterIP
