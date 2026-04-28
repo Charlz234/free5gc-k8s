@@ -11,23 +11,23 @@ mongodb:
 
 amf:
   image:
-    repository: free5gc/amf
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-amf
+    tag: v4.2.0-metrics
   replicas: 1
   hostIP: 10.0.2.3
   n2:
     port: 38412
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 ausf:
   image:
-    repository: free5gc/ausf
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-ausf
+    tag: v4.2.0-metrics
   replicas: 1
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 nef:
@@ -41,58 +41,58 @@ nef:
 
 nrf:
   image:
-    repository: free5gc/nrf
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-nrf
+    tag: v4.2.0-metrics
   replicas: 1
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 nssf:
   image:
-    repository: free5gc/nssf
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-nssf
+    tag: v4.2.0-metrics
   replicas: 1
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 pcf:
   image:
-    repository: free5gc/pcf
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-pcf
+    tag: v4.2.0-metrics
   replicas: 1
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 smf:
   image:
-    repository: free5gc/smf
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-smf
+    tag: v4.2.0-metrics
   replicas: 1
   pfcp:
     hostIP: 10.0.2.3
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 udm:
   image:
-    repository: free5gc/udm
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-udm
+    tag: v4.2.0-metrics
   replicas: 1
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 udr:
   image:
-    repository: free5gc/udr
-    tag: v4.2.0
+    repository: ghcr.io/charlz234/free5gc-udr
+    tag: v4.2.0-metrics
   replicas: 1
   metrics:
-    enabled: false
+    enabled: true
     port: 9089
 
 upf:
