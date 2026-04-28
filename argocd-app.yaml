@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: free5gc
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Charlz234/free5gc-k8s
+    targetRevision: HEAD
+    path: .
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: free5gc
+  syncPolicy:
+    syncOptions:
+      - ServerSideApply=true
