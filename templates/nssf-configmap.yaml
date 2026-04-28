@@ -29,12 +29,12 @@ data:
           supportedSnssaiList:
             - sst: 1
               sd: 010203
+      metrics:
+        enable: true
+        scheme: http
+        bindingIPv4: 0.0.0.0
+        port: 9089
     logger:
       enable: true
       level: info
       reportCaller: false
-    metrics:
-      enable: true
-      scheme: http
-      bindingIPv4: 0.0.0.0
-      port: 9089

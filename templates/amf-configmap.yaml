@@ -110,12 +110,12 @@ data:
         maxAttempts: 2
         maxInitTimeout: 2
       defaultUECtxReq: false
+      metrics:
+        enable: true
+        scheme: http
+        bindingIPv4: 0.0.0.0
+        port: 9089
     logger:
       enable: true
       level: info
       reportCaller: false
-    metrics:
-      enable: true
-      scheme: http
-      bindingIPv4: 0.0.0.0
-      port: 9089

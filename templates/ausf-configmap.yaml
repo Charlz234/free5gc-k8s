@@ -22,12 +22,12 @@ data:
           mnc: 93
       groupId: ausfGroup001
       eapAkaSupiImsiPrefix: false
+      metrics:
+        enable: true
+        scheme: http
+        bindingIPv4: 0.0.0.0
+        port: 9089
     logger:
       enable: true
       level: info
       reportCaller: false
-    metrics:
-      enable: true
-      scheme: http
-      bindingIPv4: 0.0.0.0
-      port: 9089

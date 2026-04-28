@@ -31,12 +31,12 @@ data:
         name: free5gc
         url: mongodb://mongodb:27017
       locality: area1
+      metrics:
+        enable: true
+        scheme: http
+        bindingIPv4: 0.0.0.0
+        port: 9089
     logger:
       enable: true
       level: info
       reportCaller: false
-    metrics:
-      enable: true
-      scheme: http
-      bindingIPv4: 0.0.0.0
-      port: 9089
