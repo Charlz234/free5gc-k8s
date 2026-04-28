@@ -17,41 +17,26 @@ env:
   REGISTRY: ghcr.io
   IMAGE_PREFIX: ghcr.io/charlz234/free5gc
   FREE5GC_VERSION: v4.2.0
-  # Tag appended to distinguish source-built metrics-enabled images from
-  # the upstream DockerHub pre-built images (free5gc/*:v4.2.0).
   IMAGE_TAG: v4.2.0-metrics
 
 jobs:
-  # ── Matrix: build all 8 control plane NFs in parallel ──────────────────────
   build:
     name: Build ${{ matrix.nf }}
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
-      packages: write        # required to push to GHCR
+      packages: write
 
     strategy:
-      fail-fast: false       # don't cancel other NFs if one fails
+      fail-fast: false
       matrix:
-        nf:
-          - nrf
-          - amf
-          - smf
-          - ausf
-          - udm
-          - udr
-          - pcf
-          - nssf
-        # If workflow_dispatch supplied a single NF, filter to just that one.
-        # GitHub Actions doesn't support dynamic matrix filtering natively, so
-        # we use the 'exclude' trick via a separate job (see filter job below).
+        nf: [nrf, amf, smf, ausf, udm, udr, pcf, nssf]
 
     steps:
       - name: Checkout free5gc-k8s
         uses: actions/checkout@v4
 
-      # Skip this NF if a specific one was requested and it doesn't match.
       - name: Check if this NF is selected
         id: check
         run: |
@@ -74,8 +59,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Cache Go module downloads across runs to speed up subsequent builds.
-      # The cache key is per-NF so they don't stomp each other.
       - name: Cache Go modules (via Buildx cache)
         if: steps.check.outputs.skip == 'false'
         uses: actions/cache@v4
@@ -98,12 +81,10 @@ jobs:
           tags: |
             ${{ env.IMAGE_PREFIX }}-${{ matrix.nf }}:${{ env.IMAGE_TAG }}
             ${{ env.IMAGE_PREFIX }}-${{ matrix.nf }}:latest
-          # Inline cache cuts re-build time on unchanged layers to ~30s per NF.
           cache-from: type=local,src=/tmp/.buildx-cache-${{ matrix.nf }}
           cache-to: type=local,dest=/tmp/.buildx-cache-${{ matrix.nf }}-new,mode=max
           platforms: linux/amd64
 
-      # Rotate cache to avoid unbounded growth.
       - name: Rotate Buildx cache
         if: steps.check.outputs.skip == 'false'
         run: |
@@ -111,7 +92,6 @@ jobs:
           mv /tmp/.buildx-cache-${{ matrix.nf }}-new /tmp/.buildx-cache-${{ matrix.nf }} \
             2>/dev/null || true
 
-  # ── Summary: post a job summary listing all pushed image tags ──────────────
   summary:
     name: Image Summary
     needs: build
