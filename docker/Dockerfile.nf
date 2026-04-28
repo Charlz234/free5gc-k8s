@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 # Multi-stage build for free5GC control plane NFs.
+# Clones the free5gc monorepo at the pinned release tag and initialises only
+# the submodule for the requested NF — keeps each parallel CI job independent.
+#
 # Build arg NF selects which network function to compile.
 # Usage: docker build --build-arg NF=amf -t free5gc-amf .
 
@@ -14,23 +17,25 @@ ARG NF
 ARG FREE5GC_VERSION
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git ca-certificates make \
+    git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /src
-
-# Clone only the NF submodule repo at the pinned tag.
-# Each NF lives at github.com/free5gc/{nf} and is tagged independently.
-# We do a shallow clone for speed; depth=1 is sufficient for a CI build.
+# Clone monorepo at pinned release — shallow for speed.
+# Then initialise only the one submodule needed for this build job.
+# This ensures the NF source is at exactly the commit the monorepo pins,
+# not just the latest tag on the individual NF repo.
 RUN git clone --depth 1 --branch ${FREE5GC_VERSION} \
-    https://github.com/free5gc/${NF}.git /src/${NF}
+    https://github.com/free5gc/free5gc.git /src/free5gc && \
+    cd /src/free5gc && \
+    git submodule update --init --depth 1 NFs/${NF}
 
-WORKDIR /src/${NF}
+WORKDIR /src/free5gc/NFs/${NF}
 
-# Download deps and build. The binary name matches the NF name in all cases.
+# Download deps then build. Entry point is cmd/main.go across all CP NFs
+# (verified on amf, smf, pcf at their pinned commits).
 RUN go mod download && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -ldflags="-s -w" -o /out/${NF} ./cmd/${NF}/main.go
+    go build -ldflags="-s -w" -o /out/${NF} ./cmd/main.go
 
 # ── Stage 2: runtime ──────────────────────────────────────────────────────────
 FROM debian:bookworm-slim AS runtime
