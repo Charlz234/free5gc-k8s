@@ -40,6 +40,8 @@ kind: Service
 metadata:
   name: ausf-nausf
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: ausf
 spec:
   selector:
     app: ausf

@@ -40,6 +40,8 @@ kind: Service
 metadata:
   name: nrf-nnrf
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: nrf
 spec:
   selector:
     app: nrf

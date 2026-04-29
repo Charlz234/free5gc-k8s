@@ -43,6 +43,8 @@ kind: Service
 metadata:
   name: smf-nsmf
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: smf
 spec:
   selector:
     app: smf

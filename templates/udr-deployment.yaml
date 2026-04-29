@@ -40,6 +40,8 @@ kind: Service
 metadata:
   name: udr-nudr
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: nrf
 spec:
   selector:
     app: udr

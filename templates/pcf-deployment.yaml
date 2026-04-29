@@ -40,6 +40,8 @@ kind: Service
 metadata:
   name: pcf-npcf
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: pcf
 spec:
   selector:
     app: pcf

@@ -45,6 +45,8 @@ kind: Service
 metadata:
   name: amf-namf
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: amf
 spec:
   selector:
     app: amf

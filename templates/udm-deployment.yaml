@@ -40,6 +40,8 @@ kind: Service
 metadata:
   name: udm-nudm
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: udm
 spec:
   selector:
     app: udm

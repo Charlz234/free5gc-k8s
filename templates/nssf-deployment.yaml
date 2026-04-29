@@ -40,6 +40,8 @@ kind: Service
 metadata:
   name: nssf-nnssf
   namespace: {{ .Values.global.namespace }}
+  labels:
+    app: nssf
 spec:
   selector:
     app: nssf
