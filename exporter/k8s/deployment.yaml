@@ -20,7 +20,7 @@ spec:
     spec:
       # Must run on the same node as UPF (single-node cluster: always true)
       # For multi-node: add nodeSelector matching the UPF node
-      hostNetwork: false
+      hostNetwork: true
       hostPID: false
       containers:
         - name: gtp5g-exporter
