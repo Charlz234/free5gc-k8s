@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gtp5g-exporter
+  namespace: monitoring
+  labels:
+    app: gtp5g-exporter
+spec:
+  selector:
+    app: gtp5g-exporter
+  ports:
+    - name: metrics
+      port: 9090
+      targetPort: metrics
+      protocol: TCP
+  type: ClusterIP

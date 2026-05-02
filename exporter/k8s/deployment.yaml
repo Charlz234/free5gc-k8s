@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gtp5g-exporter
+  namespace: monitoring
+  labels:
+    app: gtp5g-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gtp5g-exporter
+  template:
+    metadata:
+      labels:
+        app: gtp5g-exporter
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      # Must run on the same node as UPF (single-node cluster: always true)
+      # For multi-node: add nodeSelector matching the UPF node
+      hostNetwork: false
+      hostPID: false
+      containers:
+        - name: gtp5g-exporter
+          image: ghcr.io/charlz234/gtp5g-exporter:latest
+          imagePullPolicy: Always
+          args:
+            - --interface=upfgtp
+            - --listen-address=:9090
+          ports:
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN   # required for genetlink socket to gtp5g family
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: false   # genl requires root or NET_ADMIN; distroless nonroot
+            runAsUser: 0          # run as root, NET_ADMIN capability scopes the privilege
+          volumeMounts:
+            - name: proc
+              mountPath: /proc
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 9090
+            initialDelaySeconds: 5
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+            type: Directory

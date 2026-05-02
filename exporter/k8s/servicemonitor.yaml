@@ -1,0 +1,18 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gtp5g-exporter
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack  # must match kube-prometheus-stack's serviceMonitorSelector
+spec:
+  selector:
+    matchLabels:
+      app: gtp5g-exporter
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  endpoints:
+    - port: metrics
+      interval: 15s
+      path: /metrics
