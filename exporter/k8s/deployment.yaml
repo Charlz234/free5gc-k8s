@@ -43,8 +43,7 @@ spec:
             runAsUser: 0          # run as root, NET_ADMIN capability scopes the privilege
           volumeMounts:
             - name: proc
-              mountPath: /proc
-              readOnly: true
+              mountPath: /proc       
           livenessProbe:
             httpGet:
               path: /healthz

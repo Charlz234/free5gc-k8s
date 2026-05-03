@@ -1,0 +1,211 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-upf-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  upf-gtp5g-dashboard.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "grafana",
+              "uid": "-- Grafana --"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisBorderShow": false, "axisCenteredZero": false,
+                "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto",
+                "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line",
+                "fillOpacity": 0, "gradientMode": "none",
+                "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+                "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                "pointSize": 5, "scaleDistribution": {"type": "linear"},
+                "showPoints": "auto", "showValues": false, "spanNulls": false,
+                "stacking": {"group": "A", "mode": "none"},
+                "thresholdsStyle": {"mode": "off"}
+              },
+              "mappings": [],
+              "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": 0}, {"color": "red", "value": 80}]},
+              "unit": "bps"
+            },
+            "overrides": []
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+          "id": 5,
+          "options": {
+            "legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true},
+            "tooltip": {"hideZeros": false, "mode": "single", "sort": "none"}
+          },
+          "targets": [
+            {"editorMode": "code", "expr": "rate(free5gc_upf_interface_rx_bytes_total[1m]) * 8", "legendFormat": "RX {{interface}}", "range": true, "refId": "A"},
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "rate(free5gc_upf_interface_tx_bytes_total[1m]) * 8", "instant": false, "legendFormat": "TX {{interface}}", "range": true, "refId": "B"}
+          ],
+          "title": "Interface RX/TX bytes",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisBorderShow": false, "axisCenteredZero": false,
+                "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto",
+                "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line",
+                "fillOpacity": 0, "gradientMode": "none",
+                "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+                "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                "pointSize": 5, "scaleDistribution": {"type": "linear"},
+                "showPoints": "auto", "showValues": false, "spanNulls": false,
+                "stacking": {"group": "A", "mode": "none"},
+                "thresholdsStyle": {"mode": "off"}
+              },
+              "mappings": [],
+              "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": 0}, {"color": "red", "value": 80}]},
+              "unit": "bps"
+            },
+            "overrides": []
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+          "id": 2,
+          "options": {
+            "legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true},
+            "tooltip": {"hideZeros": false, "mode": "single", "sort": "none"}
+          },
+          "targets": [
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "sum by (ue_addr) (rate(free5gc_upf_gtp_ul_bytes_total{ue_addr!=\"<none>\"}[1m])) * 8", "instant": false, "legendFormat": "{{ue_addr}}", "range": true, "refId": "A"}
+          ],
+          "title": "UL Throughput per UE",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisBorderShow": false, "axisCenteredZero": false,
+                "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto",
+                "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line",
+                "fillOpacity": 0, "gradientMode": "none",
+                "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+                "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                "pointSize": 5, "scaleDistribution": {"type": "linear"},
+                "showPoints": "auto", "showValues": false, "spanNulls": false,
+                "stacking": {"group": "A", "mode": "none"},
+                "thresholdsStyle": {"mode": "off"}
+              },
+              "mappings": [],
+              "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": 0}, {"color": "red", "value": 80}]},
+              "unit": "pps"
+            },
+            "overrides": []
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+          "id": 4,
+          "options": {
+            "legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true},
+            "tooltip": {"hideZeros": false, "mode": "single", "sort": "none"}
+          },
+          "targets": [
+            {"editorMode": "code", "expr": "sum by (ue_addr) (rate(free5gc_upf_gtp_ul_packets_total{ue_addr!=\"<none>\"}[1m]))", "legendFormat": "UL {{ue_addr}}", "range": true, "refId": "A"},
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "sum by (ue_addr) (rate(free5gc_upf_gtp_dl_packets_total{ue_addr!=\"<none>\"}[1m]))", "instant": false, "legendFormat": "DL {{ue_addr}}", "range": true, "refId": "B"}
+          ],
+          "title": "UL/DL Packets per UE",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "palette-classic"},
+              "custom": {
+                "axisBorderShow": false, "axisCenteredZero": false,
+                "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto",
+                "barAlignment": 0, "barWidthFactor": 0.6, "drawStyle": "line",
+                "fillOpacity": 0, "gradientMode": "none",
+                "hideFrom": {"legend": false, "tooltip": false, "viz": false},
+                "insertNulls": false, "lineInterpolation": "linear", "lineWidth": 1,
+                "pointSize": 5, "scaleDistribution": {"type": "linear"},
+                "showPoints": "auto", "showValues": false, "spanNulls": false,
+                "stacking": {"group": "A", "mode": "none"},
+                "thresholdsStyle": {"mode": "off"}
+              },
+              "mappings": [],
+              "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": 0}, {"color": "red", "value": 80}]},
+              "unit": "bps"
+            },
+            "overrides": []
+          },
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+          "id": 3,
+          "options": {
+            "legend": {"calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true},
+            "tooltip": {"hideZeros": false, "mode": "single", "sort": "none"}
+          },
+          "targets": [
+            {"editorMode": "code", "expr": "sum by (ue_addr) (rate(free5gc_upf_gtp_dl_bytes_total{ue_addr!=\"<none>\"}[1m])) * 8", "legendFormat": "{{ue_addr}}", "range": true, "refId": "A"}
+          ],
+          "title": "DL Throughput per UE",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {"type": "prometheus", "uid": "prometheus"},
+          "fieldConfig": {
+            "defaults": {
+              "color": {"mode": "thresholds"},
+              "mappings": [],
+              "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": 0}, {"color": "red", "value": 80}]}
+            },
+            "overrides": []
+          },
+          "gridPos": {"h": 7, "w": 5, "x": 0, "y": 16},
+          "id": 1,
+          "options": {
+            "colorMode": "value", "graphMode": "area", "justifyMode": "auto",
+            "orientation": "auto", "percentChangeColorMode": "standard",
+            "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+            "showPercentChange": false, "textMode": "auto", "wideLayout": true
+          },
+          "targets": [
+            {"datasource": {"type": "prometheus", "uid": "prometheus"}, "editorMode": "code", "expr": "count(count by (seid) (free5gc_upf_gtp_ul_bytes_total))", "legendFormat": "__auto", "range": true, "refId": "A"}
+          ],
+          "title": "Active UE Session(s)",
+          "type": "stat"
+        }
+      ],
+      "preload": false,
+      "refresh": "5s",
+      "schemaVersion": 42,
+      "tags": [],
+      "templating": {"list": []},
+      "time": {"from": "now-15m", "to": "now"},
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "UPF GTP5G Metrics",
+      "uid": "advrmpd",
+      "version": 16,
+      "weekStart": ""
+    }
