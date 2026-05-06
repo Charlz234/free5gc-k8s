@@ -14,7 +14,21 @@ spec:
     metadata:
       labels:
         app: smf
+spec:
+  template:
     spec:
+      initContainers:
+        - name: wait-for-upf
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z upf.free5gc.svc.cluster.local 8805; do
+                echo "waiting for UPF PFCP port 8805..."
+                sleep 5
+              done
+              echo "UPF is up" 
       containers:
         - name: smf
           image: {{ .Values.smf.image.repository }}:{{ .Values.smf.image.tag }}
