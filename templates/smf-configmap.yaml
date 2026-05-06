@@ -41,17 +41,17 @@ data:
           mnc: 93
       locality: area1
       pfcp:
-        nodeID: 10.43.5.178
+        nodeID: smf-nsmf.free5gc.svc.cluster.local
         listenAddr: 0.0.0.0
-        externalAddr: 10.43.5.178
+        externalAddr: smf-nsmf.free5gc.svc.cluster.local
       userplaneInformation:
         upNodes:
           gNB1:
             type: AN
           UPF:
             type: UPF
-            nodeID: upf-pfcp
-            addr: upf-pfcp
+            nodeID: upf-pfcp.free5gc.svc.cluster.local
+            addr: upf-pfcp.free5gc.svc.cluster.local
             sNssaiUpfInfos:
               - sNssai:
                   sst: 1
