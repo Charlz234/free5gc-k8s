@@ -22,7 +22,7 @@ spec:
             - sh
             - -c
             - |
-              until nc -z upf-pfcp.free5gc.svc.cluster.local 8805; do
+              until nc -zu upf-pfcp.free5gc.svc.cluster.local 8805; do
                 echo "waiting for UPF PFCP port 8805..."
                 sleep 5
               done
