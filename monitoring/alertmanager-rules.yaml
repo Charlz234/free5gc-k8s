@@ -1,0 +1,52 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: free5gc-alerts
+  namespace: monitoring
+  labels:
+    release: kube-prometheus-stack
+spec:
+  groups:
+    - name: free5gc.nf
+      rules:
+        - alert: NfDown
+          expr: up{job=~"amf|smf|upf|ausf|udm|udr|pcf|nssf"} == 0
+          for: 30s
+          labels:
+            severity: critical
+          annotations:
+            summary: "NF {{ $labels.job }} is down"
+            description: "{{ $labels.job }} has been unreachable for 30s"
+
+        - alert: HighSbiLatency
+          expr: |
+            histogram_quantile(0.99,
+              sum by (job, le) (
+                rate(free5gc_sbi_inbound_request_duration_seconds_bucket[1m])
+              )
+            ) > 0.1
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High SBI latency on {{ $labels.job }}"
+            description: "p99 SBI latency > 100ms for 1 minute"
+
+        - alert: NoPduSessions
+          expr: sum(free5gc_amf_business_active_pdu_session_current_count) == 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "No active PDU sessions"
+            description: "No UEs have active PDU sessions for 2 minutes"
+
+        - alert: UPFHighPacketDrop
+          expr: |
+            sum(rate(free5gc_upf_gtp_ul_bytes_total[1m])) == 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "UPF GTP traffic flatlined"
+            description: "No UL GTP traffic for 2 minutes - possible UPF or tunnel issue"
