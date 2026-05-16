@@ -37,4 +37,5 @@ data:
     #!/bin/bash
     iptables -t nat -A POSTROUTING -s 10.60.0.0/16 -o ens4 -j MASQUERADE
     iptables -t nat -A POSTROUTING -s 10.61.0.0/16 -o ens4 -j MASQUERADE
+    iptables -t nat -A POSTROUTING -s 10.62.0.0/16 -d 10.43.0.0/16 -j MASQUERADE
     iptables -I FORWARD 1 -j ACCEPT
