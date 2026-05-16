@@ -43,8 +43,11 @@ data:
               sd: 010203
             - sst: 1
               sd: 112233
+            - sst: 3
+              sd: 000001
       supportDnnList:
         - internet
+        - miot
       nrfUri: http://nrf-nnrf:8000
       security:
         integrityOrder:
