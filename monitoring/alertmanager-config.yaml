@@ -24,11 +24,3 @@ spec:
             key: smtp-password
           requireTLS: true
           sendResolved: true
-          headers:
-            subject: '[free5GC] {{ .Status | toUpper }} — {{ .CommonLabels.alertname }}'
-          html: |
-            <h3>{{ .Status | toUpper }}: {{ .CommonLabels.alertname }}</h3>
-            <p><b>Severity:</b> {{ .CommonLabels.severity }}</p>
-            <p><b>Summary:</b> {{ .CommonAnnotations.summary }}</p>
-            <p><b>Description:</b> {{ .CommonAnnotations.description }}</p>
-            <p><b>Started:</b> {{ .CommonAnnotations.startsAt }}</p>
