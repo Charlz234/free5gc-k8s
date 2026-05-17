@@ -87,7 +87,7 @@ prometheus:
 
 
 alertmanager:
-  enabled: false
+  enabled: true
 
 kube-state-metrics:
   enabled: true
