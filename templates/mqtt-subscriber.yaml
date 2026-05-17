@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mqtt-subscriber-config
+  namespace: free5gc
+data:
+  subscriber.py: |
+    import paho.mqtt.client as mqtt
+    import json
+    import logging
+
+    logging.basicConfig(
+      level=logging.INFO,
+      format='%(asctime)s [%(levelname)s] %(message)s'
+    )
+    log = logging.getLogger(__name__)
+
+    BROKER = "mosquitto.free5gc.svc.cluster.local"
+    PORT = 1883
+    TOPIC = "fleet/vehicle/#"
+
+    def on_connect(client, userdata, flags, rc):
+      if rc == 0:
+        log.info(f"Connected to broker {BROKER}")
+        client.subscribe(TOPIC)
+        log.info(f"Subscribed to {TOPIC}")
+      else:
+        log.error(f"Connection failed with code {rc}")
+
+    def on_message(client, userdata, msg):
+      try:
+        payload = json.loads(msg.payload.decode())
+        log.info(
+          f"VEHICLE={payload.get('vehicle_id')} "
+          f"LAT={payload.get('lat')} "
+          f"LON={payload.get('lon')} "
+          f"SPEED={payload.get('speed_kmh')} km/h "
+          f"HEADING={payload.get('heading')}deg "
+          f"FUEL={payload.get('fuel_pct')}% "
+          f"TS={payload.get('ts')}"
+        )
+      except Exception as e:
+        log.error(f"Failed to parse message: {e} — raw: {msg.payload}")
+
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    log.info(f"Connecting to {BROKER}:{PORT}")
+    client.connect(BROKER, PORT, keepalive=300)
+    client.loop_forever()
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mqtt-subscriber
+  namespace: free5gc
+  labels:
+    app: mqtt-subscriber
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mqtt-subscriber
+  template:
+    metadata:
+      labels:
+        app: mqtt-subscriber
+    spec:
+      containers:
+        - name: subscriber
+          image: python:3.11-slim
+          command: ["/bin/sh", "-c"]
+          args: ["pip install paho-mqtt -q && python /app/subscriber.py"]
+          volumeMounts:
+            - name: script
+              mountPath: /app
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+      volumes:
+        - name: script
+          configMap:
+            name: mqtt-subscriber-config
