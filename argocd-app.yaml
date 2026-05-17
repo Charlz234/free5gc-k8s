@@ -12,6 +12,12 @@ spec:
     helm:
       valueFiles:
         - values.yaml
+  ignoreDifferences:
+    - group: monitoring.coreos.com
+      kind: AlertmanagerConfig
+      name: free5gc-alertmanager-config
+      jsonPointers:
+        - /spec/receivers
   destination:
     server: https://kubernetes.default.svc
     namespace: free5gc
